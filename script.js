@@ -88,10 +88,24 @@ const fontSlider = document.getElementById('font-slider');
 const widthVal = document.getElementById('width-val');
 const fontVal = document.getElementById('font-val');
 
-widthSlider.addEventListener('input', () => { widthVal.textContent = widthSlider.value; });
+widthSlider.addEventListener('input', () => { widthVal.value = widthSlider.value; });
+widthVal.addEventListener('change', () => {
+  let v = parseInt(widthVal.value);
+  if (isNaN(v) || v < 20) v = 20;
+  widthVal.value = v;
+  widthSlider.value = Math.min(v, parseInt(widthSlider.max));
+});
 fontSlider.addEventListener('input', () => {
-  fontVal.textContent = fontSlider.value;
+  fontVal.value = fontSlider.value;
   displayFontSize = parseInt(fontSlider.value);
+  applyFontSize();
+});
+fontVal.addEventListener('change', () => {
+  let v = parseInt(fontVal.value);
+  if (isNaN(v) || v < 1) v = 1;
+  fontVal.value = v;
+  displayFontSize = v;
+  fontSlider.value = Math.min(v, parseInt(fontSlider.max));
   applyFontSize();
 });
 
@@ -102,13 +116,13 @@ function applyFontSize() {
 document.getElementById('font-inc').addEventListener('click', () => {
   displayFontSize = Math.min(20, displayFontSize + 1);
   fontSlider.value = displayFontSize;
-  fontVal.textContent = displayFontSize;
+  fontVal.value = displayFontSize;
   applyFontSize();
 });
 document.getElementById('font-dec').addEventListener('click', () => {
-  displayFontSize = Math.max(3, displayFontSize - 1);
+  displayFontSize = Math.max(1, displayFontSize - 1);
   fontSlider.value = displayFontSize;
-  fontVal.textContent = displayFontSize;
+  fontVal.value = displayFontSize;
   applyFontSize();
 });
 
@@ -363,7 +377,7 @@ function generateBrailleASCII(pixels, w, h) {
 // ─── GENERATE ───
 function generate() {
   if (!currentImage) return;
-  const targetW = parseInt(widthSlider.value);
+  const targetW = Math.max(20, parseInt(widthVal.value) || 100);
   const canvas = document.getElementById('source-canvas');
   const ctx = canvas.getContext('2d');
   const ar = currentImage.height / currentImage.width;
