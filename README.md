@@ -2,7 +2,7 @@
 
 > **v2.1** — Convertisseur d'images en art ASCII, entièrement dans le navigateur, sans dépendance externe ni serveur.
 
----
+---a
 
 ## Table des matières
 
