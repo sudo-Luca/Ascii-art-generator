@@ -307,7 +307,7 @@ Then add the corresponding button in the HTML (`#charset-section`).
 Update the `min`, `max`, and `value` attributes of the `#width-slider` in the HTML:
 
 ```html
-<input type="range" id="width-slider" min="20" max="500" value="120" step="1">
+<input type="range" id="width-slider" min="20" max="500" value="100" step="1">
 ```
 
 ---
