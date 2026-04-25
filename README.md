@@ -1,83 +1,83 @@
 # ASCII.GEN — Image to Text Converter
 
-> **v2.1** — Convertisseur d'images en art ASCII, entièrement dans le navigateur, sans dépendance externe ni serveur.
+> **v2.1** — Convert any image to ASCII art, entirely in the browser, with no external dependencies or server required.
 
 ---
 
-## Table des matières
+## Table of Contents
 
-1. [Présentation](#présentation)
-2. [Démo rapide](#démo-rapide)
-3. [Structure des fichiers](#structure-des-fichiers)
-4. [Fonctionnalités](#fonctionnalités)
-   - [Modes de rendu](#modes-de-rendu)
-   - [Polices monospace](#polices-monospace)
-   - [Jeux de caractères](#jeux-de-caractères)
+1. [Overview](#overview)
+2. [Quick Start](#quick-start)
+3. [File Structure](#file-structure)
+4. [Features](#features)
+   - [Rendering Modes](#rendering-modes)
+   - [Monospace Fonts](#monospace-fonts)
+   - [Character Sets](#character-sets)
    - [Options](#options)
    - [Export](#export)
-5. [Architecture technique](#architecture-technique)
-   - [Pipeline de génération](#pipeline-de-génération)
-   - [Mode Edge Detection (détail)](#mode-edge-detection-détail)
-   - [Mode Braille (détail)](#mode-braille-détail)
-   - [Rendu couleur ANSI](#rendu-couleur-ansi)
-6. [Installation & utilisation](#installation--utilisation)
+5. [Technical Architecture](#technical-architecture)
+   - [Generation Pipeline](#generation-pipeline)
+   - [Edge Detection Mode (detail)](#edge-detection-mode-detail)
+   - [Braille Mode (detail)](#braille-mode-detail)
+   - [Color Rendering](#color-rendering)
+6. [Installation & Usage](#installation--usage)
 7. [Interface](#interface)
    - [Desktop](#desktop)
    - [Mobile](#mobile)
-8. [Personnalisation](#personnalisation)
-9. [Compatibilité navigateurs](#compatibilité-navigateurs)
-10. [Limitations connues](#limitations-connues)
+8. [Customization](#customization)
+9. [Browser Compatibility](#browser-compatibility)
+10. [Known Limitations](#known-limitations)
 
 ---
 
-## Présentation
+## Overview
 
-**ASCII.GEN** est une application web statique qui transforme n'importe quelle image en art ASCII. Elle fonctionne entièrement côté client via l'API Canvas HTML5 — aucune donnée n'est envoyée à un serveur.
+**ASCII.GEN** is a static web application that converts any image into ASCII art. It runs entirely client-side using the HTML5 Canvas API — no data is ever sent to a server.
 
-**Stack technique :** HTML5 · CSS3 (variables CSS, Grid, Flexbox) · JavaScript vanilla (ES6+) · Canvas API · Google Fonts (chargement externe uniquement pour les polices).
-
----
-
-## Démo rapide
-
-```
-1. Ouvrir ascii-art-generator.html dans un navigateur moderne
-2. Glisser-déposer une image dans la zone de dépôt (ou cliquer pour parcourir)
-3. Ajuster les paramètres dans la sidebar
-4. Cliquer sur « Générer → »
-5. Copier ou exporter le résultat
-```
+**Tech stack:** HTML5 · CSS3 (CSS variables, Grid, Flexbox) · Vanilla JavaScript (ES6+) · Canvas API · Google Fonts (external load for fonts only).
 
 ---
 
-## Structure des fichiers
+## Quick Start
 
 ```
-ascii-art-generator.html   # Structure HTML, layout, UI components
-style.css                  # Thème dark, design system, responsive mobile
-script.js                  # Logique de conversion, générateurs ASCII, export
+1. Open ascii-art-generator.html in a modern browser
+2. Drag and drop an image into the drop zone (or click to browse)
+3. Adjust parameters in the sidebar
+4. Click "Générer →"
+5. Copy or export the result
 ```
-
-Aucune dépendance npm, aucun bundler requis. Les trois fichiers doivent se trouver dans le même répertoire.
 
 ---
 
-## Fonctionnalités
+## File Structure
 
-### Modes de rendu
+```
+ascii-art-generator.html   # HTML structure, layout, UI components
+style.css                  # Dark theme, design system, mobile responsive
+script.js                  # Conversion logic, ASCII generators, export
+```
 
-| Mode | Description | Caractères utilisés |
-|------|-------------|---------------------|
-| **Classic Lum.** | Mappe la luminance de chaque pixel sur un caractère du jeu sélectionné | Jeu de caractères configurable |
-| **Edge Detect.** | Détecte les contours via un filtre de Sobel (avec flou gaussien préalable) et trace leur direction | `- \ | /` |
-| **Block Shade** | Utilise les caractères de remplissage Unicode pour une graduation douce | `░ ▒ ▓ █` |
-| **Braille Dots** | Encode 8 pixels par caractère braille (Unicode U+2800–U+28FF) | Blocs braille |
+No npm dependencies, no bundler required. All three files must be in the same directory.
 
-### Polices monospace
+---
 
-9 polices Google Fonts disponibles, sélectionnables depuis la sidebar :
+## Features
 
-- Space Mono *(défaut)*
+### Rendering Modes
+
+| Mode | Description | Characters used |
+|------|-------------|-----------------|
+| **Classic Lum.** | Maps each pixel's luminance to a character from the selected set | Configurable charset |
+| **Edge Detect.** | Detects edges via Sobel filter (with prior Gaussian blur) and traces their direction | `- \ | /` |
+| **Block Shade** | Uses Unicode block-fill characters for smooth gradation | `░ ▒ ▓ █` |
+| **Braille Dots** | Encodes 8 pixels per braille character (Unicode U+2800–U+28FF) | Braille blocks |
+
+### Monospace Fonts
+
+9 Google Fonts available, selectable from the sidebar:
+
+- Space Mono *(default)*
 - JetBrains Mono
 - Fira Code
 - IBM Plex Mono
@@ -87,65 +87,65 @@ Aucune dépendance npm, aucun bundler requis. Les trois fichiers doivent se trou
 - Courier Prime
 - Share Tech Mono
 
-Le changement de police s'applique instantanément à l'affichage et est pris en compte lors de l'export SVG/PNG.
+Font changes apply instantly to the display and are taken into account during SVG/PNG export.
 
-### Jeux de caractères
+### Character Sets
 
-Disponibles en mode **Classic** uniquement (désactivés pour les autres modes) :
+Available in **Classic** mode only (disabled for other modes):
 
-| Nom | Caractères | Usage recommandé |
-|-----|-----------|-----------------|
-| **Standard** | ` .,:;*?%S#@` | Polyvalent |
-| **Dense** | ` .:-=+*#%@$` | Images à fort contraste |
-| **Simple** | ` ░▒▓█` | Rendu bloc doux |
-| **Binary** | ` 1` | Effet bitmap, pixelisé |
-| **Letters** | ` .=+oXHABMW` | Style typographique |
+| Name | Characters | Recommended use |
+|------|-----------|-----------------|
+| **Standard** | ` .,:;*?%S#@` | General purpose |
+| **Dense** | ` .:-=+*#%@$` | High-contrast images |
+| **Simple** | ` ░▒▓█` | Soft block rendering |
+| **Binary** | ` 1` | Bitmap / pixelated effect |
+| **Letters** | ` .=+oXHABMW` | Typographic style |
 
 ### Options
 
-| Option | Défaut | Effet |
-|--------|--------|-------|
-| **Inverser** | OFF | Inverse la table luminance→caractère (image négative) |
-| **Couleur (ANSI)** | OFF | Colorie chaque caractère avec la couleur RGB du pixel source (via `<span>` inline) |
-| **Haut contraste** | OFF | Amplifie les zones sombres et claires : `lum < 0.5` → atténué, `lum ≥ 0.5` → amplifié |
-| **Garder ratio** | ON | Calcule la hauteur de sortie en fonction du ratio d'aspect de l'image source (avec correction ×0.5 pour la proportion des caractères) |
+| Option | Default | Effect |
+|--------|---------|--------|
+| **Invert** | OFF | Reverses the luminance→character mapping (negative image) |
+| **Color (ANSI)** | OFF | Colors each character with the source pixel's RGB value (via inline `<span>`) |
+| **High Contrast** | OFF | Amplifies dark and bright areas: `lum < 0.5` → attenuated, `lum ≥ 0.5` → amplified |
+| **Keep Ratio** | ON | Computes output height from the source image aspect ratio (with ×0.5 correction for character proportions) |
 
-**Résolution :**
-- **Width** : 20 à 300 colonnes de caractères (défaut : 100)
-- **Font px** : 4 à 16 px pour l'affichage (défaut : 6) — modifiable aussi avec les boutons `−` / `+` dans la toolbar
+**Resolution:**
+- **Width**: 20 to 300 character columns (default: 100)
+- **Font px**: 4 to 16 px for display (default: 6) — also adjustable with the `−` / `+` buttons in the toolbar
 
 ### Export
 
-| Format | Détails |
+| Format | Details |
 |--------|---------|
-| **Copier** | Copie le texte ASCII brut dans le presse-papiers (Clipboard API) |
-| **.txt** | Télécharge le texte ASCII brut en UTF-8 |
-| **.svg** | Génère un SVG vectoriel avec fond `#080808`, éléments `<text>` par ligne, police et taille actuelles |
-| **.png** | Rasterise via un `<canvas>` hors-DOM (résolution ×2 pour la netteté), télécharge en PNG |
+| **Copy** | Copies raw ASCII text to the clipboard (Clipboard API) |
+| **.txt** | Downloads raw ASCII text as UTF-8 |
+| **.svg** | Generates a vector SVG with `#080808` background, `<text>` elements per line, using the current font and size |
+| **.png** | Rasterizes via an off-DOM `<canvas>` (×2 resolution for sharpness), downloads as PNG |
 
 ---
 
-## Architecture technique
+## Technical Architecture
 
-### Pipeline de génération
+### Generation Pipeline
 
 ```
-Image source (File / DataURL)
+Source image (File / DataURL)
         │
         ▼
    loadImage()
    ┌─────────────────────────────┐
-   │  FileReader → Image HTML    │
-   │  Prévisualisation uploadZone│
+   │  FileReader → HTML Image    │
+   │  Preview shown in uploadZone│
    └─────────────────────────────┘
-        │  clic Générer
+        │  click Generate
         ▼
    generate()
    ┌─────────────────────────────────────────────┐
-   │  Calcul dimensions sw × sh                  │
-   │  (ratio corrigé ×0.5 pour chars non carrés) │
-   │  Dessin sur <canvas id="source-canvas">     │
-   │  Extraction getImageData() → Uint8ClampedArray│
+   │  Compute dimensions sw × sh                 │
+   │  (ratio corrected ×0.5 for non-square chars)│
+   │  Draw onto <canvas id="source-canvas">      │
+   │  Extract getImageData() → Uint8ClampedArray │
    └─────────────────────────────────────────────┘
         │
         ├─── mode = classic  → generateClassicASCII()
@@ -161,58 +161,58 @@ Image source (File / DataURL)
          updateInfo()
 ```
 
-### Mode Edge Detection (détail)
+### Edge Detection Mode (detail)
 
-L'algorithme opère en 5 étapes sur une grille de pixels **double hauteur** (pour compenser le ratio des glyphes) :
+The algorithm operates in 5 steps on a **double-height pixel grid** (to compensate for glyph aspect ratio):
 
-1. **Niveaux de gris** — luminance perceptuelle : `0.299·R + 0.587·G + 0.114·B`
-2. **Flou gaussien 5×5** — noyau normalisé (somme = 159) pour réduire le bruit avant le Sobel
-3. **Filtre de Sobel** — calcul des gradients Gx et Gy, magnitude `Gm` et angle `G`
-4. **Seuillage de Canny simplifié** — suppression des non-maxima + hystérésis (seuils bas/haut)
-5. **Quantification angulaire** — la direction de l'arête (0–179°) est mappée sur `- \ | /`
+1. **Grayscale** — perceptual luminance: `0.299·R + 0.587·G + 0.114·B`
+2. **5×5 Gaussian blur** — normalized kernel (sum = 159) to reduce noise before Sobel
+3. **Sobel filter** — computes Gx and Gy gradients, magnitude `Gm` and angle `G`
+4. **Simplified Canny thresholding** — non-maximum suppression + hysteresis (low/high thresholds)
+5. **Angular quantization** — edge direction (0–179°) is mapped to `- \ | /`
 
-Chaque caractère de sortie couvre 1×2 pixels de la grille interne.
+Each output character covers 1×2 pixels of the internal grid.
 
-### Mode Braille (détail)
+### Braille Mode (detail)
 
-Un caractère braille (U+2800–U+28FF) encode une grille 2×4 pixels :
+A braille character (U+2800–U+28FF) encodes a 2×4 pixel grid:
 
 ```
-Bit layout:   Position dans le bloc:
+Bit layout:   Position in block:
   0  3          col 0, row 0  |  col 1, row 0
   1  4          col 0, row 1  |  col 1, row 1
   2  5          col 0, row 2  |  col 1, row 2
   6  7          col 0, row 3  |  col 1, row 3
 ```
 
-Le codepoint résultant est `0x2800 | bitmask`. L'image est rééchantillonnée à `width×2` × `height×4` avant le calcul.
+The resulting codepoint is `0x2800 | bitmask`. The image is resampled to `width×2` × `height×4` before computation.
 
-### Rendu couleur ANSI
+### Color Rendering
 
-Quand l'option "Couleur" est activée, `generateClassicASCII()` construit en parallèle un tableau `colorData[]` contenant `rgb(r,g,b)` pour chaque caractère. `renderOutput()` crée alors un `<span>` par caractère avec `style.color` correspondant (au lieu d'un simple `pre.textContent`).
+When the "Color" option is enabled, `generateClassicASCII()` builds a parallel `colorData[]` array containing `rgb(r,g,b)` for each character. `renderOutput()` then creates one `<span>` per character with the corresponding `style.color` (instead of a plain `pre.textContent`).
 
-> ⚠️ Cette option peut ralentir le rendu sur de grandes résolutions (>150 colonnes) car elle génère plusieurs milliers d'éléments DOM.
+> ⚠️ This option may slow down rendering at large resolutions (>150 columns) as it generates thousands of DOM elements.
 
 ---
 
-## Installation & utilisation
+## Installation & Usage
 
-### Utilisation locale (sans serveur)
+### Local usage (no server)
 
 ```bash
-# Cloner ou télécharger les 3 fichiers dans un dossier
+# Clone or download the 3 files into a folder
 git clone <repo-url>
 cd ascii-gen
 
-# Ouvrir directement dans le navigateur
+# Open directly in the browser
 open ascii-art-generator.html
-# ou
+# or
 xdg-open ascii-art-generator.html  # Linux
 ```
 
-> La Clipboard API (`navigator.clipboard`) requiert un contexte sécurisé (HTTPS ou `localhost`). La copie ne fonctionnera pas avec `file://` sur certains navigateurs. Les autres fonctionnalités (génération, export) fonctionnent sans serveur.
+> The Clipboard API (`navigator.clipboard`) requires a secure context (HTTPS or `localhost`). Copying will not work over `file://` in some browsers. All other features (generation, export) work without a server.
 
-### Avec un serveur local minimal
+### With a minimal local server
 
 ```bash
 # Python 3
@@ -221,7 +221,7 @@ python -m http.server 8080
 # Node.js (npx)
 npx serve .
 
-# Puis ouvrir http://localhost:8080/ascii-art-generator.html
+# Then open http://localhost:8080/ascii-art-generator.html
 ```
 
 ---
@@ -236,10 +236,10 @@ npx serve .
 ├─────────────────────┬───────────────────────────────────────┤
 │  SIDEBAR (300px)    │  OUTPUT AREA                          │
 │                     │  ┌─ Toolbar ─────────────────────────┐│
-│  ┌ Source ──────┐   │  │ ◈ Copier │ ↓.txt │ ↓.svg │ ↓.png ││
+│  ┌ Source ──────┐   │  │ ◈ Copy │ ↓.txt │ ↓.svg │ ↓.png   ││
 │  │ Drop zone    │   │  │ − + │ 120×60 — classic — Space Mo ││
 │  └──────────────┘   │  └───────────────────────────────────┘│
-│  ┌ Résolution ──┐   │                                       │
+│  ┌ Resolution ──┐   │                                       │
 │  │ Width ████░  │   │  ██████████████████████████           │
 │  │ Font px ██░  │   │  ████ ASCII ART OUTPUT ████           │
 │  └──────────────┘   │  ██████████████████████████           │
@@ -247,64 +247,64 @@ npx serve .
 │  │Classic│Edge  │   │                                       │
 │  │Block  │Brail │   │                                       │
 │  └──────────────┘   │                                       │
-│  ┌ Police ──────┐   │                                       │
+│  ┌ Font ────────┐   │                                       │
 │  │ ...          │   │                                       │
 │  └──────────────┘   │                                       │
 │  ┌ Charset ─────┐   │                                       │
 │  │ ...          │   │                                       │
 │  └──────────────┘   │                                       │
 │  ┌ Options ─────┐   │                                       │
-│  │ Inverser  ○  │   │                                       │
-│  │ Couleur   ○  │   │                                       │
-│  │ Contraste ○  │   │                                       │
+│  │ Invert    ○  │   │                                       │
+│  │ Color     ○  │   │                                       │
+│  │ Contrast  ○  │   │                                       │
 │  │ Ratio     ●  │   │                                       │
 │  └──────────────┘   │                                       │
-│  [ Générer → ]      │                                       │
+│  [ Generate → ]     │                                       │
 └─────────────────────┴───────────────────────────────────────┘
 ```
 
-La sidebar est sticky et scrollable indépendamment de la zone de sortie.
+The sidebar is sticky and scrollable independently from the output area.
 
 ### Mobile (≤ 768px)
 
-La sidebar se masque et devient un overlay plein-écran activé par le bouton **⊟ Paramètres** en bas de l'écran. Une barre fixe en bas expose aussi le bouton **Générer →**. Après génération, la sidebar se ferme automatiquement.
+The sidebar is hidden and becomes a full-screen overlay triggered by the **⊟ Settings** button at the bottom of the screen. A fixed bottom bar also exposes the **Generate →** button. After generation, the sidebar closes automatically.
 
 ---
 
-## Personnalisation
+## Customization
 
-### Modifier le thème couleur
+### Changing the color theme
 
-Toutes les couleurs sont des variables CSS dans `:root` dans `style.css` :
+All colors are CSS variables in `:root` inside `style.css`:
 
 ```css
 :root {
-  --bg: #080808;        /* Fond principal */
-  --bg2: #0f0f0f;       /* Fond sidebar */
-  --bg3: #161616;       /* Fond éléments UI */
-  --accent: #e8ff47;    /* Jaune fluo (boutons, highlights) */
-  --accent2: #47ffe8;   /* Cyan (police, charset actif) */
-  --text: #f0f0e8;      /* Texte principal */
-  --muted: #666;        /* Texte secondaire */
+  --bg: #080808;        /* Main background */
+  --bg2: #0f0f0f;       /* Sidebar background */
+  --bg3: #161616;       /* UI element background */
+  --accent: #e8ff47;    /* Fluorescent yellow (buttons, highlights) */
+  --accent2: #47ffe8;   /* Cyan (active font, charset) */
+  --text: #f0f0e8;      /* Primary text */
+  --muted: #666;        /* Secondary text */
 }
 ```
 
-### Ajouter un jeu de caractères
+### Adding a character set
 
-Dans `script.js`, étendre l'objet `CHARSETS` :
+In `script.js`, extend the `CHARSETS` object:
 
 ```js
 const CHARSETS = {
-  // ... existants
-  monCharset: ' .oO0@'  // Du plus clair au plus sombre
+  // ... existing sets
+  myCharset: ' .oO0@'  // From lightest to darkest
 };
 ```
 
-Puis ajouter le bouton correspondant dans le HTML (section `#charset-section`).
+Then add the corresponding button in the HTML (`#charset-section`).
 
-### Modifier la plage de résolution
+### Changing the resolution range
 
-Changer les attributs `min`, `max` et `value` du slider `#width-slider` dans le HTML :
+Update the `min`, `max`, and `value` attributes of the `#width-slider` in the HTML:
 
 ```html
 <input type="range" id="width-slider" min="20" max="500" value="120" step="1">
@@ -312,25 +312,25 @@ Changer les attributs `min`, `max` et `value` du slider `#width-slider` dans le 
 
 ---
 
-## Compatibilité navigateurs
+## Browser Compatibility
 
-| Navigateur | Support |
-|-----------|---------|
-| Chrome / Edge 90+ | ✅ Complet |
-| Firefox 90+ | ✅ Complet |
-| Safari 15+ | ✅ Complet |
-| Chrome Android | ✅ Complet (interface mobile) |
-| Safari iOS 15+ | ✅ Complet (interface mobile) |
-| IE 11 | ❌ Non supporté |
+| Browser | Support |
+|---------|---------|
+| Chrome / Edge 90+ | ✅ Full |
+| Firefox 90+ | ✅ Full |
+| Safari 15+ | ✅ Full |
+| Chrome Android | ✅ Full (mobile UI) |
+| Safari iOS 15+ | ✅ Full (mobile UI) |
+| IE 11 | ❌ Not supported |
 
-Fonctionnalités requises : `Canvas API`, `FileReader`, `Clipboard API` (copie uniquement), `Unicode BMP + SMP` (braille), `CSS Custom Properties`, `CSS Grid`.
+Required features: `Canvas API`, `FileReader`, `Clipboard API` (copy only), `Unicode BMP + SMP` (braille), `CSS Custom Properties`, `CSS Grid`.
 
 ---
 
-## Limitations connues
+## Known Limitations
 
-- **Export SVG/PNG** : les polices Google Fonts ne sont pas embarquées dans les exports. Le rendu dépend des polices installées sur la machine cible.
-- **Mode couleur** : crée un nœud DOM par caractère — lent au-delà de ~150 colonnes.
-- **Braille sur mobile** : l'affichage dépend du support Unicode du système (rendu parfois incorrect sous iOS < 15).
-- **Mode Edge** : les performances peuvent baisser sur des images très haute résolution (>200 colonnes) en raison du filtre gaussien 5×5 et du Sobel calculés en pur JS.
-- **Clipboard API** : non disponible via le protocole `file://` — utiliser un serveur local pour la fonctionnalité de copie.
+- **SVG/PNG export**: Google Fonts are not embedded in exports. Rendering depends on fonts installed on the target machine.
+- **Color mode**: creates one DOM node per character — slow beyond ~150 columns.
+- **Braille on mobile**: display depends on system Unicode support (may render incorrectly on iOS < 15).
+- **Edge mode**: performance may degrade on very high-resolution inputs (>200 columns) due to the 5×5 Gaussian filter and Sobel computed in pure JS.
+- **Clipboard API**: unavailable over the `file://` protocol — use a local server for the copy feature.
