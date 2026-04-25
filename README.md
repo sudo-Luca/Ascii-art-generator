@@ -201,7 +201,7 @@ When the "Color" option is enabled, `generateClassicASCII()` builds a parallel `
 
 ```bash
 # Clone or download the 3 files into a folder
-git clone <repo-url>
+git clone https://github.com/sudo-Luca/Ascii-art-generator.git
 cd ascii-gen
 
 # Open directly in the browser
